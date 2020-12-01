@@ -5,10 +5,9 @@ void port_version()
     printf("port library version = %.1f\n", PORT_VERSION);
 }
 
-/// only one digit port numbers work
 void connect_com(int port_number)
 {
-    char com_str[9];
+    char com_str[12];
     sprintf(com_str, "\\\\.\\COM%d", port_number);
 
     HANDLE com_handle = CreateFile( com_str,             
