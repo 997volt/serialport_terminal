@@ -5,6 +5,6 @@
 #include<windows.h>
 
 void port_version(); 
-char check_com(int port_number);
+char com_check(int port_number);
 
 #endif
