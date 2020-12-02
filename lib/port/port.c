@@ -5,14 +5,19 @@ void port_version()
     printf("port library version = %.1f\n", PORT_VERSION);
 }
 
-BOOL com_check(int port_number)
+HANDLE com_open(int port_number)
 {
     char com_str[12];
     sprintf(com_str, "\\\\.\\COM%d", port_number);
 
-    HANDLE com_handle = CreateFile( com_str,             
-                        GENERIC_READ | GENERIC_WRITE,
-                        0, NULL, OPEN_EXISTING, 0, NULL);        
+    return CreateFile( com_str,             
+                    GENERIC_READ | GENERIC_WRITE,
+                    0, NULL, OPEN_EXISTING, 0, NULL);        
+}
+
+BOOL com_check(int port_number)
+{
+    HANDLE com_handle = com_open(port_number);
 
     if (com_handle == INVALID_HANDLE_VALUE)
     {
@@ -26,7 +31,19 @@ BOOL com_check(int port_number)
     return TRUE;
 }
 
-int com_read(int port_number)
+void com_read(int port_number)
+{
+    HANDLE com_handle = com_open(port_number);
+
+    if (com_handle == INVALID_HANDLE_VALUE)
+    {
+        printf("Error opening port\n");
+        CloseHandle(com_handle);
+        return;
+    }
+}
+
+int com_read_one(int port_number)
 {
     char com_str[12];
     sprintf(com_str, "\\\\.\\COM%d", port_number);
