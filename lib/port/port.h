@@ -2,9 +2,10 @@
 #define _PORT_H_
 
 #include <stdio.h>
-#include<windows.h>
+#include <windows.h>
 
 void port_version(); 
-char com_check(int port_number);
+BOOL com_check(int port_number);
+int com_read(int port_number);
 
 #endif

@@ -5,7 +5,7 @@ void port_version()
     printf("port library version = %.1f\n", PORT_VERSION);
 }
 
-char com_check(int port_number)
+BOOL com_check(int port_number)
 {
     char com_str[12];
     sprintf(com_str, "\\\\.\\COM%d", port_number);
@@ -16,14 +16,21 @@ char com_check(int port_number)
 
     if (com_handle == INVALID_HANDLE_VALUE)
     {
-        printf("Error opening port");
+        printf("Error opening port\n");
         CloseHandle(com_handle);
-        return 0;
+        return FALSE;
     } 
 
-    printf("port opened");
+    printf("port opened\n");
     CloseHandle(com_handle);
-    return 1;
+    return TRUE;
+}
+
+int com_read(int port_number)
+{
+    
+
+   
 }
 
 
