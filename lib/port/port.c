@@ -73,15 +73,26 @@ COMMTIMEOUTS com_timeouts_init()
     return timeouts;
 }
 
+BOOL com_check_timeouts(HANDLE com_handle, COMMTIMEOUTS timeouts)
+{
+    if (SetCommTimeouts(com_handle, &timeouts) == FALSE)
+    {
+        printf("Error setting timeouts\n");
+        CloseHandle(com_handle);
+        return FALSE;
+    }
+    printf("Timeouts set succesfully\n");
+    return TRUE;
+}
+
 void com_read(int port_number)
 {
     HANDLE com_handle = com_open(port_number);
-    if(!check_com_handle(com_handle, "Error opening port"))
+    if(!check_com_handle(com_handle, "Error opening port")
+        && !com_check_dcb(com_handle, com_dcb_init())
+        && !com_check_timeouts(com_handle, com_timeouts_init()))
     {
-        if(!com_check_dcb(com_handle, com_dcb_init()))
-        {
-            //do stuff
-        }        
+        //do stuff          
     }
 }
 
