@@ -48,12 +48,12 @@ DCB com_dcb_init()
     return dcbSerialParams;
 }
 
-BOOL com_check_dcb(HANDLE *com_handle, DCB dcbSerialParams)
+BOOL com_check_dcb(HANDLE com_handle, DCB dcbSerialParams)
 {
-    if (!GetCommState(*com_handle, &dcbSerialParams))
+    if (!GetCommState(com_handle, &dcbSerialParams))
     {
         printf("Error initializing DCB\n");
-        CloseHandle(*com_handle);
+        CloseHandle(com_handle);
         return FALSE;
     }  
 
@@ -72,24 +72,24 @@ COMMTIMEOUTS com_timeouts_init()
     return timeouts;
 }
 
-BOOL com_check_timeouts(HANDLE *com_handle, COMMTIMEOUTS timeouts)
+BOOL com_check_timeouts(HANDLE com_handle, COMMTIMEOUTS timeouts)
 {
-    if (!SetCommTimeouts(*com_handle, &timeouts))
+    if (!SetCommTimeouts(com_handle, &timeouts))
     {
         printf("Error setting timeouts\n");
-        CloseHandle(*com_handle);
+        CloseHandle(com_handle);
         return FALSE;
     }
     printf("Timeouts set succesfully\n");
     return TRUE;
 }
 
-BOOL com_check_mask(HANDLE *com_handle)
+BOOL com_check_mask(HANDLE com_handle)
 {
-	if (!SetCommMask(*com_handle, EV_RXCHAR))
+	if (!SetCommMask(com_handle, EV_RXCHAR))
     {
         printf("Error setting CommMask");
-        CloseHandle(*com_handle);
+        CloseHandle(com_handle);
         return FALSE;
     }
     printf("COM mask set succesfully\n");
@@ -99,10 +99,13 @@ BOOL com_check_mask(HANDLE *com_handle)
 int com_read(int port_number)
 {
     HANDLE com_handle = com_open(port_number);
+    DCB dcbSerialParams = com_dcb_init();
+    COMMTIMEOUTS timeouts = com_timeouts_init();
+
     if( com_check_handle(com_handle)
-        && com_check_dcb(&com_handle, com_dcb_init())
-        && com_check_timeouts(&com_handle, com_timeouts_init())
-        && com_check_mask(&com_handle))
+        && GetCommState(com_handle, &dcbSerialParams)
+        && SetCommTimeouts(com_handle, &timeouts)
+        && SetCommMask(com_handle, EV_RXCHAR))
     {
         DWORD dwEventMask;                     // Event mask to trigger
         char  TempChar;                        // Temperory Character
@@ -127,9 +130,7 @@ int com_read(int port_number)
                 i++;
         }while (NoBytesRead > 0); 
         
-        printf("\n\n    ");
-        int j =0;
-        for (j = 0; j < i-1; j++)		// j < i-1 to remove the dupliated last character
+        for (int j = 0; j < i-1; j++)		// j < i-1 to remove the dupliated last character
             printf("%c", SerialBuffer[j]);	
 
         return 0;           	
