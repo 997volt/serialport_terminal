@@ -3,7 +3,7 @@
 int main()
 {
     port_version();
-    com_read(4);
+    com_check(4);
     
     return 0;
 }

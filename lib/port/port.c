@@ -25,6 +25,7 @@ BOOL check_com_handle(HANDLE com_handle, char error_message[])
         return FALSE;
     }
 
+    printf("port opened succesfully\n");
     return TRUE;
 }
 
@@ -32,16 +33,9 @@ BOOL com_check(int port_number)
 {
     HANDLE com_handle = com_open(port_number);
 
-    if (com_handle == INVALID_HANDLE_VALUE)
-    {
-        printf("Error opening port\n");
-        CloseHandle(com_handle);
-        return FALSE;
-    }
-
-    printf("port opened\n");
+    BOOL result = check_com_handle(com_handle, "Error opening port");
     CloseHandle(com_handle);
-    return TRUE;
+    return result;
 }
 
 void com_read(int port_number)
