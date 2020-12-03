@@ -57,7 +57,20 @@ BOOL com_check_dcb(HANDLE com_handle, DCB dcbSerialParams)
         CloseHandle(com_handle);
         return FALSE;
     }  
+
+    printf("DCB initialized succesfully\n");
     return TRUE;
+}
+
+COMMTIMEOUTS com_timeouts_init()
+{
+    COMMTIMEOUTS timeouts = { 0 };
+    timeouts.ReadIntervalTimeout         = 50;
+    timeouts.ReadTotalTimeoutConstant    = 50;
+    timeouts.ReadTotalTimeoutMultiplier  = 10;
+    timeouts.WriteTotalTimeoutConstant   = 50;
+    timeouts.WriteTotalTimeoutMultiplier = 10;
+    return timeouts;
 }
 
 void com_read(int port_number)
@@ -65,12 +78,10 @@ void com_read(int port_number)
     HANDLE com_handle = com_open(port_number);
     if(!check_com_handle(com_handle, "Error opening port"))
     {
-        DCB dcbSerialParams = com_dcb_init();
-        if(!com_check_dcb(com_handle, dcbSerialParams))
+        if(!com_check_dcb(com_handle, com_dcb_init()))
         {
             //do stuff
-        }
-        
+        }        
     }
 }
 
