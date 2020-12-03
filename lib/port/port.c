@@ -38,12 +38,23 @@ BOOL com_check(int port_number)
     return result;
 }
 
+DCB com_dcb_init()
+{
+    DCB dcbSerialParams = { 0 };                         // Initializing DCB structure
+    dcbSerialParams.DCBlength = sizeof(dcbSerialParams);
+    dcbSerialParams.BaudRate = CBR_9600;      // Setting BaudRate = 9600
+    dcbSerialParams.ByteSize = 8;             // Setting ByteSize = 8
+    dcbSerialParams.StopBits = ONESTOPBIT;    // Setting StopBits = 1
+    dcbSerialParams.Parity = NOPARITY;        // Setting Parity = None 
+    return dcbSerialParams;
+}
+
 void com_read(int port_number)
 {
     HANDLE com_handle = com_open(port_number);
     if(!check_com_handle(com_handle, "Error opening port"))
     {
-        //read
+        DCB dcbSerialParams = com_dcb_init();
     }
 }
 
