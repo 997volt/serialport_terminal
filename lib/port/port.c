@@ -32,7 +32,7 @@ BOOL com_check(int port_number)
 {
     HANDLE com_handle = com_open(port_number);
 
-    BOOL result = check_com_handle(com_handle, "Error opening port");
+    BOOL result = com_check_handle(com_handle);
     CloseHandle(com_handle);
     return result;
 }
@@ -96,10 +96,10 @@ BOOL com_check_mask(HANDLE *com_handle)
     return TRUE;
 }
 
-void com_read(int port_number)
+int com_read(int port_number)
 {
     HANDLE com_handle = com_open(port_number);
-    if(check_com_handle(com_handle)
+    if( com_check_handle(com_handle)
         && com_check_dcb(&com_handle, com_dcb_init())
         && com_check_timeouts(&com_handle, com_timeouts_init())
         && com_check_mask(&com_handle))
@@ -117,7 +117,7 @@ void com_read(int port_number)
         {
             printf("\n    Error! in Setting WaitCommEvent()");
             CloseHandle(com_handle);
-            return 5;
+            return 1;
         }			
 
         do
@@ -130,7 +130,9 @@ void com_read(int port_number)
         printf("\n\n    ");
         int j =0;
         for (j = 0; j < i-1; j++)		// j < i-1 to remove the dupliated last character
-            printf("%c", SerialBuffer[j]);		
+            printf("%c", SerialBuffer[j]);	
+
+        return 0;           	
     }
     
     CloseHandle(com_handle);
