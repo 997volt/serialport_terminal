@@ -15,12 +15,11 @@ HANDLE com_open(int port_number)
                     0, NULL, OPEN_EXISTING, 0, NULL);        
 }
 
-BOOL com_check_handle(HANDLE com_handle, char error_message[])
+BOOL com_check_handle(HANDLE com_handle)
 {
     if (com_handle == INVALID_HANDLE_VALUE)
     {
-        printf(error_message);
-        printf("\n");
+        printf(, "Error opening port\n");
         CloseHandle(com_handle);
         return FALSE;
     }
@@ -85,12 +84,25 @@ BOOL com_check_timeouts(HANDLE com_handle, COMMTIMEOUTS timeouts)
     return TRUE;
 }
 
+BOOL com_check_mask(HANDLE com_handle)
+{
+	if (SetCommMask(com_handle, EV_RXCHAR) == FALSE)
+    {
+        printf("Error setting CommMask");
+        CloseHandle(com_handle);
+        return FALSE;
+    }
+    printf("COM mask set succesfully\n");
+    return TRUE;
+}
+
 void com_read(int port_number)
 {
     HANDLE com_handle = com_open(port_number);
-    if(!check_com_handle(com_handle, "Error opening port")
-        && !com_check_dcb(com_handle, com_dcb_init())
-        && !com_check_timeouts(com_handle, com_timeouts_init()))
+    if(check_com_handle(com_handle)
+        && com_check_dcb(com_handle, com_dcb_init())
+        && com_check_timeouts(com_handle, com_timeouts_init())
+        && com_check_mask(com_handle))
     {
         //do stuff          
     }

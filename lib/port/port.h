@@ -6,7 +6,7 @@
 
 void port_version();
 HANDLE com_open(int port_number);
-BOOL com_check_handle(HANDLE com_handle, char error_message[]);
+BOOL com_check_handle(HANDLE com_handle);
 BOOL com_check(int port_number);
 DCB com_dcb_init();
 BOOL com_check_dcb(HANDLE com_handle, DCB dcbSerialParams);
