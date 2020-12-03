@@ -14,6 +14,5 @@ COMMTIMEOUTS com_timeouts_init();
 BOOL com_check_timeouts(HANDLE *com_handle, COMMTIMEOUTS timeouts);
 BOOL com_check_mask(HANDLE *com_handle);
 void com_read(int port_number);
-int com_read_one(int port_number);
 
 #endif
