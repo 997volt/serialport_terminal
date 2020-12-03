@@ -15,7 +15,7 @@ HANDLE com_open(int port_number)
                     0, NULL, OPEN_EXISTING, 0, NULL);        
 }
 
-BOOL check_com_handle(HANDLE com_handle, char error_message[])
+BOOL com_check_handle(HANDLE com_handle, char error_message[])
 {
     if (com_handle == INVALID_HANDLE_VALUE)
     {
@@ -49,12 +49,28 @@ DCB com_dcb_init()
     return dcbSerialParams;
 }
 
+BOOL com_check_dcb(HANDLE com_handle, DCB dcbSerialParams)
+{
+    if (GetCommState(com_handle, &dcbSerialParams) == FALSE)
+    {
+        printf("Error initializing DCB\n");
+        CloseHandle(com_handle);
+        return FALSE;
+    }  
+    return TRUE;
+}
+
 void com_read(int port_number)
 {
     HANDLE com_handle = com_open(port_number);
     if(!check_com_handle(com_handle, "Error opening port"))
     {
         DCB dcbSerialParams = com_dcb_init();
+        if(!com_check_dcb(com_handle, dcbSerialParams))
+        {
+            //do stuff
+        }
+        
     }
 }
 
