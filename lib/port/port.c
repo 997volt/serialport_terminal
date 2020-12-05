@@ -96,35 +96,39 @@ BOOL com_check_mask(HANDLE com_handle)
     return TRUE;
 }
 
+BOOL com_wait_for_event(HANDLE com_handle)
+{
+    DWORD dwEventMask;
+    if (!WaitCommEvent(com_handle, &dwEventMask, NULL))
+    {
+        printf("Error Setting WaitCommEvent");
+        CloseHandle(com_handle);
+        return FALSE;
+    }	
+
+    return TRUE;
+}
+
 int com_read(int port_number)
 {
     HANDLE com_handle = com_open(port_number);
-    DCB dcbSerialParams = com_dcb_init();
-    COMMTIMEOUTS timeouts = com_timeouts_init();
 
     if( com_check_handle(com_handle)
-        && GetCommState(com_handle, &dcbSerialParams)
-        && SetCommTimeouts(com_handle, &timeouts)
-        && SetCommMask(com_handle, EV_RXCHAR))
+        && com_check_dcb(com_handle, com_dcb_init())
+        && com_check_timeouts(com_handle, com_timeouts_init())
+        && com_check_mask(com_handle)
+        && com_wait_for_event(com_handle))
     {
-        DWORD dwEventMask;                     // Event mask to trigger
         char  TempChar;                        // Temperory Character
         char  SerialBuffer[256];               // Buffer Containing Rxed Data
         DWORD NoBytesRead;                     // Bytes read by ReadFile()
-        int i = 0;				
-
-        if (!WaitCommEvent(com_handle, &dwEventMask, NULL))
-        {
-            printf("\n    Error! in Setting WaitCommEvent()");
-            CloseHandle(com_handle);
-            return 1;
-        }			
+        int i = 0;	
 
         do
         {
-                BOOL Status = ReadFile(com_handle, &TempChar, sizeof(TempChar), &NoBytesRead, NULL);
-                SerialBuffer[i] = TempChar;
-                i++;
+            BOOL Status = ReadFile(com_handle, &TempChar, sizeof(TempChar), &NoBytesRead, NULL);
+            SerialBuffer[i] = TempChar;
+            i++;
         }while (NoBytesRead > 0); 
         
         for (int j = 0; j < i-1; j++)		// j < i-1 to remove the dupliated last character
