@@ -39,12 +39,12 @@ BOOL com_check(int port_number)
 
 DCB com_dcb_init()
 {
-    DCB dcbSerialParams = { 0 };                         // Initializing DCB structure
+    DCB dcbSerialParams = { 0 };                         
     dcbSerialParams.DCBlength = sizeof(dcbSerialParams);
-    dcbSerialParams.BaudRate = CBR_9600;      // Setting BaudRate = 9600
-    dcbSerialParams.ByteSize = 8;             // Setting ByteSize = 8
-    dcbSerialParams.StopBits = ONESTOPBIT;    // Setting StopBits = 1
-    dcbSerialParams.Parity = NOPARITY;        // Setting Parity = None 
+    dcbSerialParams.BaudRate = CBR_9600;      
+    dcbSerialParams.ByteSize = 8;             
+    dcbSerialParams.StopBits = ONESTOPBIT;    
+    dcbSerialParams.Parity = NOPARITY;        
     return dcbSerialParams;
 }
 
@@ -111,12 +111,9 @@ int com_read(int port_number)
         char  TempChar;                        // Temperory Character
         char  SerialBuffer[256];               // Buffer Containing Rxed Data
         DWORD NoBytesRead;                     // Bytes read by ReadFile()
-        int i = 0;
+        int i = 0;				
 
-        //Wait for the character to be received
-        BOOL Status = WaitCommEvent(com_handle, &dwEventMask, NULL); 					
-
-        if (WaitCommEvent(com_handle, &dwEventMask, NULL) == FALSE)
+        if (!WaitCommEvent(com_handle, &dwEventMask, NULL))
         {
             printf("\n    Error! in Setting WaitCommEvent()");
             CloseHandle(com_handle);
@@ -125,18 +122,17 @@ int com_read(int port_number)
 
         do
         {
-                Status = ReadFile(com_handle, &TempChar, sizeof(TempChar), &NoBytesRead, NULL);
+                BOOL Status = ReadFile(com_handle, &TempChar, sizeof(TempChar), &NoBytesRead, NULL);
                 SerialBuffer[i] = TempChar;
                 i++;
         }while (NoBytesRead > 0); 
         
         for (int j = 0; j < i-1; j++)		// j < i-1 to remove the dupliated last character
-            printf("%c", SerialBuffer[j]);	
-
-        return 0;           	
+            printf("%c", SerialBuffer[j]);	                   	
     }
     
     CloseHandle(com_handle);
+    return 0;
 }
 
 
