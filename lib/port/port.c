@@ -37,20 +37,25 @@ BOOL com_check(int port_number)
     return result;
 }
 
-DCB com_dcb_init()
+DCB com_dcb_init(HANDLE com_handle)
 {
     DCB dcbSerialParams = { 0 };                         
     dcbSerialParams.DCBlength = sizeof(dcbSerialParams);
-    dcbSerialParams.BaudRate = CBR_9600;      
-    dcbSerialParams.ByteSize = 8;             
-    dcbSerialParams.StopBits = ONESTOPBIT;    
-    dcbSerialParams.Parity = NOPARITY;        
+
+    if (GetCommState(com_handle, &dcbSerialParams))
+    {
+        dcbSerialParams.BaudRate = CBR_9600;      
+        dcbSerialParams.ByteSize = 8;             
+        dcbSerialParams.StopBits = ONESTOPBIT;    
+        dcbSerialParams.Parity = NOPARITY;    
+    }    
+        
     return dcbSerialParams;
 }
 
 BOOL com_check_dcb(HANDLE com_handle, DCB dcbSerialParams)
 {
-    if (!GetCommState(com_handle, &dcbSerialParams))
+    if (!SetCommState(com_handle, &dcbSerialParams))
     {
         printf("Error initializing DCB\n");
         CloseHandle(com_handle);
@@ -114,7 +119,7 @@ int com_read(int port_number)
     HANDLE com_handle = com_open(port_number);
 
     if( com_check_handle(com_handle)
-        && com_check_dcb(com_handle, com_dcb_init())
+        && com_check_dcb(com_handle, com_dcb_init(com_handle))
         && com_check_timeouts(com_handle, com_timeouts_init())
         && com_check_mask(com_handle)
         && com_wait_for_event(com_handle))
