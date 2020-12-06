@@ -8,7 +8,8 @@ void port_version();
 
 HANDLE com_init(int port_number);
 BOOL com_check(int port_number);
-BOOL com_dcb_init(HANDLE com_handle);
+BOOL com_dcb_default_init(HANDLE com_handle);
+BOOL com_dcb_init(HANDLE com_handle, int baundrate);
 BOOL com_timeouts_init(HANDLE com_handle);
 HANDLE com_open(int port_number);
 

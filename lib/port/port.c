@@ -22,7 +22,7 @@ BOOL com_check(int port_number)
     return com_handle == INVALID_HANDLE_VALUE;
 }
 
-BOOL com_dcb_init(HANDLE com_handle)
+BOOL com_dcb_default_init(HANDLE com_handle)
 {
     DCB dcbSerialParams = { 0 };                         
     dcbSerialParams.DCBlength = sizeof(dcbSerialParams);
@@ -31,6 +31,22 @@ BOOL com_dcb_init(HANDLE com_handle)
     {
         dcbSerialParams.BaudRate = CBR_9600;      
         dcbSerialParams.ByteSize = 8;             
+        dcbSerialParams.StopBits = ONESTOPBIT;    
+        dcbSerialParams.Parity = NOPARITY;   
+        return SetCommState(com_handle, &dcbSerialParams);        
+    }
+    return FALSE;
+}
+
+BOOL com_dcb_init(HANDLE com_handle, int baundrate)
+{
+    DCB dcbSerialParams = { 0 };                         
+    dcbSerialParams.DCBlength = sizeof(dcbSerialParams);
+
+    if (GetCommState(com_handle, &dcbSerialParams))
+    {
+        dcbSerialParams.BaudRate = baundrate;      
+        dcbSerialParams.ByteSize = 8;
         dcbSerialParams.StopBits = ONESTOPBIT;    
         dcbSerialParams.Parity = NOPARITY;   
         return SetCommState(com_handle, &dcbSerialParams);        
@@ -54,7 +70,7 @@ HANDLE com_open(int port_number)
     HANDLE com_handle = com_init(port_number);
 
     if( com_handle != INVALID_HANDLE_VALUE
-        && com_dcb_init(com_handle)
+        && com_dcb_init(com_handle, 9600)
         && com_timeouts_init(com_handle)
         && SetCommMask(com_handle, EV_RXCHAR))
     {
