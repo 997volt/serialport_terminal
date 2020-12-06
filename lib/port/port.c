@@ -77,28 +77,29 @@ BOOL com_wait_for_event(HANDLE com_handle)
     return TRUE;
 }
 
-int com_read(HANDLE com_handle)
+int find_char_index(char array[], int size, char to_find)
 {
-    if( com_handle != INVALID_HANDLE_VALUE
-        && com_wait_for_event(com_handle))
+    for (int i = 0; i < size; i++)
     {
-        char  TempChar;                        // Temperory Character
-        char  SerialBuffer[256];               // Buffer Containing Rxed Data
-        DWORD NoBytesRead;                     // Bytes read by ReadFile()
-        int i = 0;	
-
-        do
-        {
-            BOOL Status = ReadFile(com_handle, &TempChar, sizeof(TempChar), &NoBytesRead, NULL);
-            SerialBuffer[i] = TempChar;
-            i++;
-        }while (NoBytesRead > 0); 
+        if (array[i] == to_find)
+            return i;
+    }
         
-        for (int j = 0; j < i-1; j++)		// j < i-1 to remove the dupliated last character
-            printf("%c", SerialBuffer[j]);	                   	
+    return -1;
+}
+
+char * com_read(HANDLE com_handle)
+{
+    static char serial_buffer[32]; 
+
+    if( com_handle != INVALID_HANDLE_VALUE && com_wait_for_event(com_handle))
+    {      
+        DWORD read_bytes_count = 1;                     
+        for (int i = 0; read_bytes_count > 0; i++)
+            ReadFile(com_handle, &serial_buffer[i], sizeof(serial_buffer[i]), &read_bytes_count, NULL);           	
     }    
     
-    return 0;
+    return serial_buffer;
 }
 
 

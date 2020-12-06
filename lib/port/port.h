@@ -13,6 +13,7 @@ BOOL com_timeouts_init(HANDLE com_handle);
 HANDLE com_open(int port_number);
 
 BOOL com_wait_for_event(HANDLE com_handle);
-int com_read(HANDLE com_handle);
+int find_char_index(char array[], int size, char to_find);
+char * com_read(HANDLE com_handle);
 
 #endif
