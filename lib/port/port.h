@@ -10,10 +10,9 @@ HANDLE com_init(int port_number);
 BOOL com_check(int port_number);
 BOOL com_dcb_init(HANDLE com_handle);
 BOOL com_timeouts_init(HANDLE com_handle);
-
-BOOL com_check_mask(HANDLE com_handle);
-BOOL com_wait_for_event(HANDLE com_handle);
 HANDLE com_open(int port_number);
-int com_read(int port_number);
+
+BOOL com_wait_for_event(HANDLE com_handle);
+int com_read(HANDLE com_handle);
 
 #endif

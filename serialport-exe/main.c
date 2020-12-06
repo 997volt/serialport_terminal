@@ -3,7 +3,9 @@
 int main()
 {
     port_version();
-    com_read(4);
+    HANDLE com_handle = com_open(4);
+    com_read(com_handle);
+    CloseHandle(com_handle);
     
     return 0;
 }

@@ -49,18 +49,21 @@ BOOL com_timeouts_init(HANDLE com_handle)
     return SetCommTimeouts(com_handle, &timeouts);
 }
 
-
-
-BOOL com_check_mask(HANDLE com_handle)
+HANDLE com_open(int port_number)
 {
-	if (!SetCommMask(com_handle, EV_RXCHAR))
+    HANDLE com_handle = com_init(port_number);
+
+    if( com_handle != INVALID_HANDLE_VALUE
+        && com_dcb_init(com_handle)
+        && com_timeouts_init(com_handle)
+        && SetCommMask(com_handle, EV_RXCHAR))
     {
-        printf("Error setting CommMask");
-        CloseHandle(com_handle);
-        return FALSE;
+        printf("COM%d - Serial Port openned succesfully\n", port_number);
+        return com_handle;
     }
-    printf("COM mask set succesfully\n");
-    return TRUE;
+
+    printf("Error oppening COM%d\n", port_number);
+    return INVALID_HANDLE_VALUE;
 }
 
 BOOL com_wait_for_event(HANDLE com_handle)
@@ -69,21 +72,14 @@ BOOL com_wait_for_event(HANDLE com_handle)
     if (!WaitCommEvent(com_handle, &dwEventMask, NULL))
     {
         printf("Error Setting WaitCommEvent");
-        CloseHandle(com_handle);
         return FALSE;
     }	
-
     return TRUE;
 }
 
-int com_read(int port_number)
+int com_read(HANDLE com_handle)
 {
-    HANDLE com_handle = com_init(port_number);
-
     if( com_handle != INVALID_HANDLE_VALUE
-        && com_dcb_init(com_handle)
-        && com_timeouts_init(com_handle)
-        && com_check_mask(com_handle)
         && com_wait_for_event(com_handle))
     {
         char  TempChar;                        // Temperory Character
@@ -100,9 +96,8 @@ int com_read(int port_number)
         
         for (int j = 0; j < i-1; j++)		// j < i-1 to remove the dupliated last character
             printf("%c", SerialBuffer[j]);	                   	
-    }
+    }    
     
-    CloseHandle(com_handle);
     return 0;
 }
 
