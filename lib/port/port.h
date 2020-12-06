@@ -5,10 +5,11 @@
 #include <windows.h>
 
 void port_version();
+
 HANDLE com_init(int port_number);
-BOOL com_check_handle(HANDLE com_handle);
 BOOL com_check(int port_number);
-DCB com_dcb_init(HANDLE com_handle);
+BOOL com_dcb_init(HANDLE com_handle);
+
 BOOL com_check_dcb(HANDLE com_handle, DCB dcbSerialParams);
 COMMTIMEOUTS com_timeouts_init();
 BOOL com_check_timeouts(HANDLE com_handle, COMMTIMEOUTS timeouts);

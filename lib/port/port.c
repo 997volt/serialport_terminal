@@ -5,7 +5,7 @@ void port_version()
     printf("port library version = %.1f\n", PORT_VERSION);
 }
 
-HANDLE com_open(int port_number)
+HANDLE com_init(int port_number)
 {
     char com_str[12];
     sprintf(com_str, "\\\\.\\COM%d", port_number);
@@ -15,29 +15,14 @@ HANDLE com_open(int port_number)
                     0, NULL, OPEN_EXISTING, 0, NULL);        
 }
 
-BOOL com_check_handle(HANDLE com_handle)
-{
-    if (com_handle == INVALID_HANDLE_VALUE)
-    {
-        printf("Error opening port\n");
-        CloseHandle(com_handle);
-        return FALSE;
-    }
-
-    printf("port opened succesfully\n");
-    return TRUE;
-}
-
 BOOL com_check(int port_number)
 {
-    HANDLE com_handle = com_open(port_number);
-
-    BOOL result = com_check_handle(com_handle);
+    HANDLE com_handle = com_init(port_number);
     CloseHandle(com_handle);
-    return result;
+    return com_handle == INVALID_HANDLE_VALUE;
 }
 
-DCB com_dcb_init(HANDLE com_handle)
+BOOL com_dcb_init(HANDLE com_handle)
 {
     DCB dcbSerialParams = { 0 };                         
     dcbSerialParams.DCBlength = sizeof(dcbSerialParams);
@@ -47,24 +32,12 @@ DCB com_dcb_init(HANDLE com_handle)
         dcbSerialParams.BaudRate = CBR_9600;      
         dcbSerialParams.ByteSize = 8;             
         dcbSerialParams.StopBits = ONESTOPBIT;    
-        dcbSerialParams.Parity = NOPARITY;    
-    }    
-        
-    return dcbSerialParams;
+        dcbSerialParams.Parity = NOPARITY;   
+        return SetCommState(com_handle, &dcbSerialParams);        
+    }
+    return FALSE;
 }
 
-BOOL com_check_dcb(HANDLE com_handle, DCB dcbSerialParams)
-{
-    if (!SetCommState(com_handle, &dcbSerialParams))
-    {
-        printf("Error initializing DCB\n");
-        CloseHandle(com_handle);
-        return FALSE;
-    }  
-
-    printf("DCB initialized succesfully\n");
-    return TRUE;
-}
 
 COMMTIMEOUTS com_timeouts_init()
 {
@@ -116,10 +89,10 @@ BOOL com_wait_for_event(HANDLE com_handle)
 
 int com_read(int port_number)
 {
-    HANDLE com_handle = com_open(port_number);
+    HANDLE com_handle = com_init(port_number);
 
-    if( com_check_handle(com_handle)
-        && com_check_dcb(com_handle, com_dcb_init(com_handle))
+    if( com_handle != INVALID_HANDLE_VALUE
+        && com_dcb_init(com_handle)
         && com_check_timeouts(com_handle, com_timeouts_init())
         && com_check_mask(com_handle)
         && com_wait_for_event(com_handle))
