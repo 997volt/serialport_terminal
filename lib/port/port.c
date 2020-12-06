@@ -38,8 +38,7 @@ BOOL com_dcb_init(HANDLE com_handle)
     return FALSE;
 }
 
-
-COMMTIMEOUTS com_timeouts_init()
+BOOL com_timeouts_init(HANDLE com_handle)
 {
     COMMTIMEOUTS timeouts = { 0 };
     timeouts.ReadIntervalTimeout         = 50;
@@ -47,20 +46,10 @@ COMMTIMEOUTS com_timeouts_init()
     timeouts.ReadTotalTimeoutMultiplier  = 10;
     timeouts.WriteTotalTimeoutConstant   = 50;
     timeouts.WriteTotalTimeoutMultiplier = 10;
-    return timeouts;
+    return SetCommTimeouts(com_handle, &timeouts);
 }
 
-BOOL com_check_timeouts(HANDLE com_handle, COMMTIMEOUTS timeouts)
-{
-    if (!SetCommTimeouts(com_handle, &timeouts))
-    {
-        printf("Error setting timeouts\n");
-        CloseHandle(com_handle);
-        return FALSE;
-    }
-    printf("Timeouts set succesfully\n");
-    return TRUE;
-}
+
 
 BOOL com_check_mask(HANDLE com_handle)
 {
@@ -93,7 +82,7 @@ int com_read(int port_number)
 
     if( com_handle != INVALID_HANDLE_VALUE
         && com_dcb_init(com_handle)
-        && com_check_timeouts(com_handle, com_timeouts_init())
+        && com_timeouts_init(com_handle)
         && com_check_mask(com_handle)
         && com_wait_for_event(com_handle))
     {
